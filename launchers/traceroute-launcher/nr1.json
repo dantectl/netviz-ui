@@ -1,0 +1,7 @@
+{
+  "schemaType": "LAUNCHER",
+  "id": "traceroute-launcher",
+  "displayName": "TracerouteLauncher",
+  "description": "Describe me",
+  "rootNerdletId": "8ad75049-4245-4a0f-9764-929f13ef90ae.traceroute-nd"
+}
