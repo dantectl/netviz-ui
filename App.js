@@ -158,3 +158,182 @@ export default function App() {
                   <td style={tdStyle}>{item.hop ?? '-'}</td>
                   <td style={tdStyle}>{item.ip ?? '-'}</td>
                   <td style={tdStyle}>{item.asn ?? '-'}</td>
+                  <td style={tdStyle}>
+                    {item.lossPercent ?? '-'}
+                    %
+                  </td>
+                  <td style={tdStyle}>{item.avg ?? '-'}</td>
+                  <td style={tdStyle}>{item.best ?? '-'}</td>
+                  <td style={tdStyle}>{item.worst ?? '-'}</td>
+                  <td style={tdStyle}>{item.city ?? '-'}</td>
+                  <td style={tdStyle}>{item.country ?? '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Hop diagram */}
+          <div style={{ marginTop: '2rem' }}>
+            <h3>Hop Diagram</h3>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                overflowX: 'auto'
+              }}
+            >
+              {results.hops.map((hop, index) => (
+                <React.Fragment key={index}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      minWidth: '120px',
+                      margin: '0 12px'
+                    }}
+                  >
+                    {/* Node Icon */}
+                    <div
+                      style={{
+                        backgroundColor: '#007aff',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '50px',
+                        height: '50px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        fontWeight: 'bold',
+                        fontSize: '16px',
+                        boxShadow: '0 0 4px rgba(0,0,0,0.2)'
+                      }}
+                    >
+                      {hop.hop}
+                    </div>
+
+                    {/* IP and metrics */}
+                    <div
+                      style={{
+                        marginTop: '8px',
+                        textAlign: 'center',
+                        fontSize: '12px',
+                        width: '100px',
+                        wordWrap: 'break-word'
+                      }}
+                    >
+                      <strong>{hop.ip}</strong>
+                      <br />
+                      {hop.city && hop.country
+                        ? `${hop.city}, ${hop.country}`
+                        : ''}
+                      <br />
+                      <span style={{ color: '#666' }}>
+                        {hop.avg ?? '-'}ms avg
+                        <br />
+                        {hop.lossPercent ?? '-'}% loss
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Arrow connector */}
+                  {index < results.hops.length - 1 && (
+                    <svg
+                      width="40"
+                      height="20"
+                      style={{ flexShrink: 0 }}
+                    >
+                      <defs>
+                        <marker
+                          id="arrowhead"
+                          markerWidth="10"
+                          markerHeight="7"
+                          refX="10"
+                          refY="3.5"
+                          orient="auto"
+                        >
+                          <polygon
+                            points="0 0, 10 3.5, 0 7"
+                            fill="#888"
+                          />
+                        </marker>
+                      </defs>
+                      <line
+                        x1="0"
+                        y1="10"
+                        x2="40"
+                        y2="10"
+                        stroke="#888"
+                        strokeWidth="2"
+                        markerEnd="url(#arrowhead)"
+                      />
+                    </svg>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+
+          {/* Leaflet map */}
+          {results.hops.some((h) => h.lat && h.lon) && (
+            <div
+              style={{
+                marginTop: '2rem',
+                height: '400px',
+                width: '100%'
+              }}
+            >
+              <h3>Traceroute Map</h3>
+              <MapContainer
+                center={[
+                  results.hops[0].lat || 20,
+                  results.hops[0].lon || 0
+                ]}
+                zoom={2}
+                style={{ height: '100%', width: '100%' }}
+              >
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+                {results.hops
+                  .filter((h) => h.lat && h.lon)
+                  .map((hop, idx) => (
+                    <Marker
+                      key={idx}
+                      position={[hop.lat, hop.lon]}
+                      icon={L.icon({
+                        iconUrl:
+                          'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41]
+                      })}
+                    >
+                      <Popup>
+                        <div>
+                          <strong>
+                            Hop {hop.hop}: {hop.ip}
+                          </strong>
+                          <br />
+                          {hop.city}, {hop.country}
+                          <br />
+                          Avg: {hop.avg}ms
+                          <br />
+                          Loss: {hop.lossPercent}%
+                        </div>
+                      </Popup>
+                    </Marker>
+                  ))}
+
+                <Polyline
+                  positions={results.hops
+                    .filter((h) => h.lat && h.lon)
+                    .map((h) => [h.lat, h.lon])}
+                  color="blue"
+                />
+              </MapContainer>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
