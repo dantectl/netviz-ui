@@ -11,7 +11,7 @@ import {
   TextField,
   Table,
   TableHeader,
-  TableHeaderCell, // ✅ Added this missing import
+  TableHeaderCell, 
   TableRow,
   TableRowCell
 } from 'nr1';
@@ -66,7 +66,7 @@ export default function App() {
 
       if (!response.ok) throw new Error(data.error || 'Unknown error');
 
-      console.log("🚀 Traceroute results:", data); // ✅ Log raw response
+      console.log("🚀 Traceroute results:", data);
       console.log("✅ hops valid array?", Array.isArray(data.hops), "length:", data.hops?.length);
 
       setResults(data);
@@ -103,7 +103,7 @@ export default function App() {
         <div style={{ marginTop: '1rem' }}>
           <h3>Traceroute to {results.target}</h3>
           <p><strong>Run ID:</strong> {results.runId}</p>
-          <p><strong>Hop Count:</strong> {results.hops?.length || 0}</p> {/* ✅ Debug visible on UI */}
+          <p><strong>Hop Count:</strong> {results.hops?.length || 0}</p> {/* Debug visible on UI */}
 
           <table style={{ width: '100%', marginTop: '1rem', borderCollapse: 'collapse' }}>
             <thead>
